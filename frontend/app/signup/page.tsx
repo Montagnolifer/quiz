@@ -39,7 +39,7 @@ export default function SignUpPage() {
         throw new Error("Password must be at least 6 characters")
       }
 
-      const res = await fetch("http://localhost:3005/auth/register", {
+      const res = await fetch("http://localhost:3005/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

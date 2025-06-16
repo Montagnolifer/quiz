@@ -15,7 +15,7 @@ export default function QuizPage() {
 
     const fetchQuiz = async () => {
       try {
-        const res = await fetch(`http://localhost:3005/quizzes/${id}`)
+        const res = await fetch(`http://localhost:3005/api/quizzes/${id}`)
         const data = await res.json()
         if (!res.ok) throw new Error(data.message || "Erro ao buscar quiz")
         setQuiz(data)

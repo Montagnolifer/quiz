@@ -26,7 +26,7 @@ export function NotificationSettingsForm({ initialSettings }: NotificationSettin
     setIsSaving(true)
 
     try {
-      const res = await fetch('http://localhost:3005/user/me', {
+      const res = await fetch('http://localhost:3005/api/user/me', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

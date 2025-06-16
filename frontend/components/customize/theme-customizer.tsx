@@ -43,7 +43,7 @@ useEffect(() => {
     }
 
     try {
-      const res = await fetch(`http://localhost:3005/quizzes/${quizId}`, {
+      const res = await fetch(`http://localhost:3005/api/quizzes/${quizId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -90,7 +90,7 @@ useEffect(() => {
     setError(null)
   
     try {
-      const res = await fetch(`http://localhost:3005/quizzes/${quizId}`, {
+      const res = await fetch(`http://localhost:3005/api/quizzes/${quizId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -12,7 +12,7 @@ async function apiRequest(path: string, options: RequestInit) {
   const token = getToken()
   if (!token) throw new Error('Usuário não autenticado.')
 
-  const res = await fetch(`http://localhost:3005${path}`, {
+  const res = await fetch(`http://localhost:3005/api${path}`, {
     ...options,
     headers: {
       ...(options.headers || {}),
