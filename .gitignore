@@ -1,0 +1,60 @@
+# Node
+node_modules/
+dist/
+.build/
+.cache/
+.env
+.env.local
+.env.*.local
+
+# Next.js build output
+.next/
+out/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# PM2 Logs
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage reports
+coverage/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# VSCode settings
+.vscode/
+
+# Typescript build output
+*.tsbuildinfo
+
+# Prisma
+prisma/migrations/
+prisma/dev.db
+prisma/*.sqlite
+
+# Test snapshots
+*.snap
+
+# Optional: Ignore frontend build (caso use buildado pra produção)
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+
+# Optional: Ignore backend build
+backend/dist/
+backend/node_modules/
+
+# Others
+.idea/
+*.swp
