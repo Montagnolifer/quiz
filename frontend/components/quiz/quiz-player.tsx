@@ -122,7 +122,7 @@ export default function QuizPlayer({ quizId, initialData }: QuizPlayerProps) {
       try {
         const cookieProgressId = cookies.quiz_progress_id?.[quizId]
   
-        const response = await fetch(`http://localhost:3005/api/quizzes/${quizId}/progress?progressId=${cookieProgressId || ""}`)
+        const response = await fetch(`http://localhost:3005/quizzes/${quizId}/progress?progressId=${cookieProgressId || ""}`)
         const data = await response.json()
   
         if (data.progress) {
@@ -163,7 +163,7 @@ export default function QuizPlayer({ quizId, initialData }: QuizPlayerProps) {
       const fetchQuiz = async () => {
         try {
           const token = localStorage.getItem("token")
-          const response = await fetch(`http://localhost:3005/api/quizzes/${quizId}`, {
+          const response = await fetch(`http://localhost:3005/quizzes/${quizId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -257,7 +257,7 @@ export default function QuizPlayer({ quizId, initialData }: QuizPlayerProps) {
           result_node_id: undefined,
         }        
 
-        const response = await fetch(`http://localhost:3005/api/quizzes/${quizId}/progress`, {
+        const response = await fetch(`http://localhost:3005/quizzes/${quizId}/progress`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -612,7 +612,7 @@ export default function QuizPlayer({ quizId, initialData }: QuizPlayerProps) {
       // Mark progress as completed
       if (progressId) {
         console.log("Marking progress as completed with ID:", progressId)
-        await fetch(`http://localhost:3005/api/quizzes/${quizId}/progress`, {
+        await fetch(`http://localhost:3005/quizzes/${quizId}/progress`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
@@ -627,7 +627,7 @@ export default function QuizPlayer({ quizId, initialData }: QuizPlayerProps) {
       // Save quiz attempt with only the fields that exist in the schema
       console.log("Inserting quiz attempt with answers:", answers)
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:3005/api/quizzes/quiz-attempts", {
+      const response = await fetch("http://localhost:3005/quizzes/quiz-attempts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

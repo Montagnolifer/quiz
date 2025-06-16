@@ -37,7 +37,7 @@ export function PasswordChangeForm() {
     setIsChanging(true)
 
     try {
-      const res = await fetch('http://localhost:3005/api/user/me/password', {
+      const res = await fetch('http://localhost:3005/user/me/password', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

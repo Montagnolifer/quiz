@@ -12,7 +12,9 @@ async function apiRequest(path: string, options: RequestInit) {
   const token = getToken()
   if (!token) throw new Error('Usuário não autenticado.')
 
-  const res = await fetch(`http://localhost:3005/api${path}`, {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
+      const res = await fetch(`${apiUrl}/${path}`, {
     ...options,
     headers: {
       ...(options.headers || {}),

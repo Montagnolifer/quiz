@@ -22,7 +22,7 @@ export default function SettingsPage() {
     }
 
     const fetchUser = async () => {
-      const res = await fetch('http://localhost:3005/api/user/me', {
+      const res = await fetch('http://localhost:3005/user/me', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

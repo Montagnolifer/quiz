@@ -43,7 +43,9 @@ useEffect(() => {
     }
 
     try {
-      const res = await fetch(`http://localhost:3005/api/quizzes/${quizId}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
+      const res = await fetch(`${apiUrl}/quizzes/${quizId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -90,7 +92,9 @@ useEffect(() => {
     setError(null)
   
     try {
-      const res = await fetch(`http://localhost:3005/api/quizzes/${quizId}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
+      const res = await fetch(`${apiUrl}/quizzes/${quizId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
