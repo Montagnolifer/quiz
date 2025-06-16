@@ -1,110 +1,93 @@
-"use server"
+'use server'
 
-import { createServerSupabaseClient } from "@/lib/supabase"
-import { createQuiz, updateQuiz, deleteQuiz, publishQuiz, createQuizAttempt } from "@/lib/db-utils"
-import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
-/**
- * Creates a new quiz for the current user
- */
-export async function createNewQuiz(formData: FormData) {
-  const supabase = createServerSupabaseClient()
+function getToken() {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem('token')
+}
 
-  // Get the current user
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
-    throw new Error("You must be logged in to create a quiz")
+async function apiRequest(path: string, options: RequestInit) {
+  const token = getToken()
+  if (!token) throw new Error('Usuário não autenticado.')
+
+  const res = await fetch(`http://localhost:3005${path}`, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    throw new Error(data.message || 'Erro na requisição')
   }
 
-  const title = (formData.get("title") as string) || "New Quiz"
-  const description = (formData.get("description") as string) || ""
+  return res.json()
+}
 
-  const quiz = await createQuiz(session.user.id, { title, description })
+export async function createNewQuiz(formData: FormData) {
+  const title = (formData.get('title') as string) || 'New Quiz'
+  const description = (formData.get('description') as string) || ''
 
-  revalidatePath("/dashboard")
+  const quiz = await apiRequest('/quizzes', {
+    method: 'POST',
+    body: JSON.stringify({
+      title,
+      description,
+      status: 'draft',
+      flow_data: { nodes: [], edges: [] },
+      theme_settings: {},
+    }),
+  })
+
+  revalidatePath('/dashboard')
   redirect(`/editor/${quiz.id}`)
 }
 
-/**
- * Updates an existing quiz
- */
 export async function updateExistingQuiz(quizId: string, data: any) {
-  const supabase = createServerSupabaseClient()
-
-  // Get the current user
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
-    throw new Error("You must be logged in to update a quiz")
-  }
-
-  await updateQuiz(quizId, session.user.id, data)
+  await apiRequest(`/quizzes/${quizId}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
 
   revalidatePath(`/dashboard/${quizId}`)
   revalidatePath(`/editor/${quizId}`)
 }
 
-/**
- * Publishes a quiz
- */
 export async function publishExistingQuiz(quizId: string) {
-  const supabase = createServerSupabaseClient()
-
-  // Get the current user
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
-    throw new Error("You must be logged in to publish a quiz")
-  }
-
-  await publishQuiz(quizId, session.user.id)
+  await apiRequest(`/quizzes/${quizId}/publish`, {
+    method: 'PUT',
+  })
 
   revalidatePath(`/dashboard/${quizId}`)
   revalidatePath(`/dashboard`)
 }
 
-/**
- * Deletes a quiz
- */
 export async function deleteExistingQuiz(quizId: string) {
-  const supabase = createServerSupabaseClient()
+  await apiRequest(`/quizzes/${quizId}`, {
+    method: 'DELETE',
+  })
 
-  // Get the current user
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) {
-    throw new Error("You must be logged in to delete a quiz")
-  }
-
-  await deleteQuiz(quizId, session.user.id)
-
-  revalidatePath("/dashboard")
-  redirect("/dashboard")
+  revalidatePath('/dashboard')
+  redirect('/dashboard')
 }
 
-/**
- * Records a quiz attempt
- */
 export async function recordQuizAttempt(
   quizId: string,
   resultNodeId: string | undefined,
   answers: Record<string, any>,
 ) {
-  const supabase = createServerSupabaseClient()
-
-  // Get the current user (optional)
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const userId = session?.user?.id
-
-  await createQuizAttempt(quizId, resultNodeId, answers, userId)
+  await apiRequest(`/quizzes/${quizId}/attempts`, {
+    method: 'POST',
+    body: JSON.stringify({
+      resultNodeId,
+      answers,
+    }),
+  })
 
   revalidatePath(`/dashboard/${quizId}`)
   revalidatePath(`/analytics/${quizId}`)

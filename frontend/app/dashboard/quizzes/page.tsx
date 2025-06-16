@@ -9,7 +9,7 @@ import { SidebarNav } from "@/components/layout/sidebar-nav"
 import { DashboardHeader } from "@/components/layout/dashboard-header"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 import QuizCard from "@/components/dashboard/quiz-card"
-import RequireToken from "@/hooks/require-token"
+import RequireToken from "@/hooks/require-token" 
 
 export default function QuizzesPage() {
   const router = useRouter()
@@ -87,15 +87,66 @@ export default function QuizzesPage() {
     }
   }  
 
-  const handlePublishQuiz = (id: string) => {
-    setQuizzes(quizzes.map(q => q.id === id ? { ...q, status: "published" } : q))
-  }
+  const handlePublishQuiz = async (id: string) => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      setError('Usuário não autenticado.')
+      return
+    }
+  
+    try {
+      const res = await fetch(`http://localhost:3005/quizzes/${id}/publish`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+  
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.message || 'Erro ao publicar o quiz')
+      }
+  
+      // Atualiza localmente
+      setQuizzes((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, status: 'published' } : q))
+      )
+    } catch (error: any) {
+      setError(error.message || 'Erro inesperado ao publicar')
+    }
+  }  
 
-  const handleDeleteQuiz = (id: string) => {
-    if (confirm("Are you sure you want to delete this quiz?")) {
-      setQuizzes(quizzes.filter(q => q.id !== id))
+  const handleDeleteQuiz = async (id: string) => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      setError('Usuário não autenticado.')
+      return
+    }
+  
+    if (!confirm('Tem certeza que deseja deletar esse quiz?')) {
+      return
+    }
+  
+    try {
+      const res = await fetch(`http://localhost:3005/quizzes/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+  
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.message || 'Erro ao deletar o quiz')
+      }
+  
+      // Remove localmente
+      setQuizzes((prev) => prev.filter((q) => q.id !== id))
+    } catch (error: any) {
+      setError(error.message || 'Erro inesperado ao deletar')
     }
   }
+  
 
   if (loading) {
     return <div className="text-center py-8">Loading your quizzes...</div>

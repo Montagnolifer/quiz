@@ -13,4 +13,10 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({ nullable: true })
+  theme: string;  // Exemplo: "dark", "light"
+
+  @Column({ type: 'json', nullable: true })
+  settings: any;  // Exemplo: { notifications: true, darkMode: true }
 }

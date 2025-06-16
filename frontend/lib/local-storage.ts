@@ -1,4 +1,4 @@
-// Local storage utilities for managing data without Supabase
+// Local storage utilities for managing data without
 export interface Quiz {
   id: string
   title: string

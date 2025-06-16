@@ -1,13 +1,10 @@
-"use client"
+'use client'
 
-import type React from "react"
-
-import { useState } from "react"
-import { supabase } from "@/lib/supabase"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { useToast } from '@/components/ui/use-toast'
 
 interface NotificationSettings {
   quizCompletions: boolean
@@ -17,10 +14,9 @@ interface NotificationSettings {
 
 interface NotificationSettingsFormProps {
   initialSettings: NotificationSettings
-  userId: string
 }
 
-export function NotificationSettingsForm({ initialSettings, userId }: NotificationSettingsFormProps) {
+export function NotificationSettingsForm({ initialSettings }: NotificationSettingsFormProps) {
   const [settings, setSettings] = useState<NotificationSettings>(initialSettings)
   const [isSaving, setIsSaving] = useState(false)
   const { toast } = useToast()
@@ -30,27 +26,34 @@ export function NotificationSettingsForm({ initialSettings, userId }: Notificati
     setIsSaving(true)
 
     try {
-      const { error } = await supabase.from("user_preferences").upsert(
-        {
-          user_id: userId,
-          notification_settings: settings,
-          updated_at: new Date().toISOString(),
+      const res = await fetch('http://localhost:3005/user/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        { onConflict: "user_id" },
-      )
-
-      if (error) throw error
-
-      toast({
-        title: "Notification settings updated",
-        description: "Your notification preferences have been saved.",
+        body: JSON.stringify({
+          settings: {
+            notifications: settings,
+          },
+        }),
       })
-    } catch (error) {
-      console.error("Error saving notification settings:", error)
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.message || 'Erro ao salvar configurações')
+      }
+
       toast({
-        title: "Save failed",
-        description: "There was an error saving your notification settings.",
-        variant: "destructive",
+        title: 'Preferências salvas',
+        description: 'Suas preferências de notificação foram atualizadas.',
+      })
+    } catch (error: any) {
+      console.error('Erro ao salvar preferências:', error)
+      toast({
+        title: 'Erro ao salvar',
+        description: error.message,
+        variant: 'destructive',
       })
     } finally {
       setIsSaving(false)
@@ -63,7 +66,7 @@ export function NotificationSettingsForm({ initialSettings, userId }: Notificati
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="quiz-completions">Quiz Completions</Label>
-            <p className="text-sm text-muted-foreground">Receive notifications when someone completes your quiz</p>
+            <p className="text-sm text-muted-foreground">Receba notificações quando alguém concluir seu quiz</p>
           </div>
           <Switch
             id="quiz-completions"
@@ -74,7 +77,7 @@ export function NotificationSettingsForm({ initialSettings, userId }: Notificati
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="new-results">New Results</Label>
-            <p className="text-sm text-muted-foreground">Receive notifications about new quiz results and analytics</p>
+            <p className="text-sm text-muted-foreground">Seja avisado sobre novos resultados e análises</p>
           </div>
           <Switch
             id="new-results"
@@ -85,7 +88,7 @@ export function NotificationSettingsForm({ initialSettings, userId }: Notificati
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="marketing">Marketing</Label>
-            <p className="text-sm text-muted-foreground">Receive emails about new features and promotional offers</p>
+            <p className="text-sm text-muted-foreground">Receba emails sobre novidades e ofertas</p>
           </div>
           <Switch
             id="marketing"
@@ -96,7 +99,7 @@ export function NotificationSettingsForm({ initialSettings, userId }: Notificati
       </div>
       <div className="flex justify-end">
         <Button type="submit" disabled={isSaving}>
-          {isSaving ? "Saving..." : "Save preferences"}
+          {isSaving ? 'Salvando...' : 'Salvar Preferências'}
         </Button>
       </div>
     </form>

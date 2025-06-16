@@ -1,6 +1,6 @@
 // src/quizzes/quizzes.controller.ts
 import {
-  Body, Controller, Get, Param, Patch, Post, Put, Query, UseGuards, Request
+  Body, Controller, Get, Param, Patch, Post, Put, Delete, Query, UseGuards, Request
 } from '@nestjs/common'
 import { QuizzesService } from './quizzes.service'
 import { CreateQuizDto } from './dto/create-quiz.dto'
@@ -92,6 +92,19 @@ export class QuizzesController {
   async getAnalytics(@Param('quizId') quizId: string) {
     return this.quizzesService.getAnalyticsByQuizId(quizId)
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/publish')
+  async publishQuiz(@Param('id') id: string, @Request() req) {
+    return this.quizzesService.publishQuiz(id, req.user.id)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async deleteQuiz(@Param('id') id: string, @Request() req) {
+    return this.quizzesService.deleteQuiz(id, req.user.id)
+  }
+
 
   
 }

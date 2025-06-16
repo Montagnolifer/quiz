@@ -1,39 +1,57 @@
-import { createServerSupabaseClient } from "@/lib/supabase"
-import { redirect } from "next/navigation"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ProfileSettingsForm } from "@/components/settings/profile-settings-form"
-import { PasswordChangeForm } from "@/components/settings/password-change-form"
-import { NotificationSettingsForm } from "@/components/settings/notification-settings-form"
-import { DisplaySettingsForm } from "@/components/settings/display-settings-form"
+'use client'
 
-export default async function SettingsPage() {
-  const supabase = createServerSupabaseClient()
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ProfileSettingsForm } from '@/components/settings/profile-settings-form'
+import { PasswordChangeForm } from '@/components/settings/password-change-form'
+import { NotificationSettingsForm } from '@/components/settings/notification-settings-form'
+import { DisplaySettingsForm } from '@/components/settings/display-settings-form'
 
-  // Verificar se o usuário está autenticado
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+export default function SettingsPage() {
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-  if (!session) {
-    redirect("/login")
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/login')
+      return
+    }
+
+    const fetchUser = async () => {
+      const res = await fetch('http://localhost:3005/user/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (res.status === 401) {
+        router.push('/login')
+        return
+      }
+
+      const data = await res.json()
+      setUser(data)
+      setLoading(false)
+    }
+
+    fetchUser()
+  }, [router])
+
+  if (loading) {
+    return <div>Loading settings...</div>
   }
 
-  // Fetch user preferences
-  const { data: preferences } = await supabase
-    .from("user_preferences")
-    .select("*")
-    .eq("user_id", session.user.id)
-    .single()
-
-  // Default preferences if none exist
-  const notificationSettings = preferences?.notification_settings || {
+  const notificationSettings = user.settings?.notifications || {
     quizCompletions: true,
     newResults: true,
     marketing: false,
   }
 
-  const theme = preferences?.theme || "system"
+  const theme = user.theme || 'system'
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -50,7 +68,6 @@ export default async function SettingsPage() {
           <TabsTrigger value="display">Display</TabsTrigger>
         </TabsList>
 
-        {/* Profile Tab */}
         <TabsContent value="profile">
           <Card>
             <CardHeader>
@@ -58,25 +75,23 @@ export default async function SettingsPage() {
               <CardDescription>Update your profile information and photo</CardDescription>
             </CardHeader>
             <CardContent>
-              <ProfileSettingsForm user={session.user} />
+              <ProfileSettingsForm user={user} />
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Account Tab */}
         <TabsContent value="account">
           <Card>
             <CardHeader>
               <CardTitle>Change Password</CardTitle>
               <CardDescription>Update your password to keep your account secure</CardDescription>
             </CardHeader>
-            <CardContent>
-              <PasswordChangeForm />
-            </CardContent>
+            {/* <CardContent>
+                <PasswordChangeForm userId={user.id} />
+            </CardContent> */}
           </Card>
         </TabsContent>
 
-        {/* Notifications Tab */}
         <TabsContent value="notifications">
           <Card>
             <CardHeader>
@@ -84,12 +99,11 @@ export default async function SettingsPage() {
               <CardDescription>Configure which emails you want to receive</CardDescription>
             </CardHeader>
             <CardContent>
-              <NotificationSettingsForm initialSettings={notificationSettings} userId={session.user.id} />
+              <NotificationSettingsForm initialSettings={notificationSettings} />
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Display Tab */}
         <TabsContent value="display">
           <Card>
             <CardHeader>
@@ -97,7 +111,7 @@ export default async function SettingsPage() {
               <CardDescription>Select your preferred theme</CardDescription>
             </CardHeader>
             <CardContent>
-              <DisplaySettingsForm initialTheme={theme} userId={session.user.id} />
+              <DisplaySettingsForm initialTheme={theme} />
             </CardContent>
           </Card>
         </TabsContent>

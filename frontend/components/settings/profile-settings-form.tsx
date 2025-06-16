@@ -1,64 +1,52 @@
-"use client"
+'use client'
 
-import type React from "react"
-
-import { useState } from "react"
-import type { User } from "@supabase/supabase-js"
-import { supabase } from "@/lib/supabase"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
-import { ProfileImageUpload } from "./profile-image-upload"
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useToast } from '@/components/ui/use-toast'
 
 interface ProfileSettingsFormProps {
-  user: User
+  user: {
+    id: number
+    name: string
+    email: string
+    theme?: string
+    settings?: any
+  }
 }
 
 export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
-  const [name, setName] = useState(user.user_metadata?.name || "")
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(
-    user.user_metadata?.avatar_url && typeof user.user_metadata.avatar_url === "string"
-      ? user.user_metadata.avatar_url
-      : null,
-  )
+  const [name, setName] = useState(user.name || '')
   const [isSaving, setIsSaving] = useState(false)
   const { toast } = useToast()
-
-  // Get user initials for avatar fallback
-  const userInitials =
-    name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .substring(0, 2) ||
-    user.email?.substring(0, 2).toUpperCase() ||
-    "U"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSaving(true)
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: {
-          name,
+      const res = await fetch('http://localhost:3005/user/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
+        body: JSON.stringify({ name }),
       })
 
-      if (error) throw error
+      if (!res.ok) throw new Error('Erro ao atualizar perfil')
 
       toast({
-        title: "Profile updated",
-        description: "Your profile information has been updated successfully.",
+        title: 'Perfil atualizado!',
+        description: 'Suas informações foram salvas com sucesso.',
       })
     } catch (error) {
-      console.error("Error updating profile:", error)
+      console.error('Erro ao atualizar perfil:', error)
       toast({
-        title: "Update failed",
-        description: "There was an error updating your profile.",
-        variant: "destructive",
+        title: 'Falha na atualização',
+        description: 'Não foi possível atualizar seu perfil.',
+        variant: 'destructive',
       })
     } finally {
       setIsSaving(false)
@@ -67,28 +55,18 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6">
-        <ProfileImageUpload
-          userId={user.id}
-          initialAvatarUrl={avatarUrl}
-          userInitials={userInitials}
-          onAvatarUpdate={setAvatarUrl}
-        />
-        <div className="space-y-4 flex-1">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" value={user.email} disabled />
-            <p className="text-sm text-muted-foreground">Your email address is used for login and cannot be changed.</p>
-          </div>
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="name">Nome</Label>
+        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome" />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input id="email" value={user.email} disabled />
+        <p className="text-sm text-muted-foreground">Seu email é usado para login e não pode ser alterado.</p>
       </div>
       <div className="flex justify-end">
         <Button type="submit" disabled={isSaving}>
-          {isSaving ? "Saving..." : "Save changes"}
+          {isSaving ? 'Salvando...' : 'Salvar alterações'}
         </Button>
       </div>
     </form>

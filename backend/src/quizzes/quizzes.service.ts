@@ -50,8 +50,8 @@ export class QuizzesService {
   }
 
   async findPublicById(id: string): Promise<Quiz | null> {
-    const quiz = await this.quizRepository.findOne({ where: { id, status: 'published' } })
-    if (!quiz) throw new NotFoundException("Quiz não encontrado ou não publicado")
+    const quiz = await this.quizRepository.findOne({ where: { id } })
+    if (!quiz) throw new NotFoundException("Quiz não encontrado")
     return quiz
   }
 
@@ -93,8 +93,6 @@ export class QuizzesService {
       throw error
     }
   }
-  
-  
 
   async completeProgress(data: UpdateQuizProgressDto) {
     return await this.progressRepo.update({ progress_id: data.progress_id }, {
@@ -102,7 +100,6 @@ export class QuizzesService {
       result_node_id: data.result_node_id,
     })
   }
-
 
   async getAttemptsByQuizId(quizId: string) {
     return this.attemptRepo.find({
@@ -161,6 +158,18 @@ export class QuizzesService {
     }
   }
   
+  async publishQuiz(id: string, userId: string) {
+    const quiz = await this.quizRepository.findOne({ where: { id, user_id: userId } })
+    if (!quiz) throw new NotFoundException('Quiz não encontrado')
+    quiz.status = 'published'
+    return this.quizRepository.save(quiz)
+  }
+  
+  async deleteQuiz(id: string, userId: string) {
+    const quiz = await this.quizRepository.findOne({ where: { id, user_id: userId } })
+    if (!quiz) throw new NotFoundException('Quiz não encontrado')
+    return this.quizRepository.remove(quiz)
+  }
   
   
 }
