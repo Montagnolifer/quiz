@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"  
+import { useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,11 +8,21 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-export default function LoginPage() {
-  const router = useRouter()
+function MessageAlert() {
   const searchParams = useSearchParams()
   const message = searchParams.get("message")
 
+  if (!message) return null
+
+  return (
+    <Alert className="mb-4">
+      <AlertDescription>{message}</AlertDescription>
+    </Alert>
+  )
+}
+
+export default function LoginPage() {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({ email: "", password: "" })
@@ -38,7 +48,6 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Invalid credentials")
 
       localStorage.setItem("token", data.access_token)
-
       router.push("/dashboard")
     } catch (error: any) {
       setError(error.message || "Login failed")
@@ -55,11 +64,10 @@ export default function LoginPage() {
           <CardDescription>Enter your email and password to access your account</CardDescription>
         </CardHeader>
         <CardContent>
-          {message && (
-            <Alert className="mb-4">
-              <AlertDescription>{message}</AlertDescription>
-            </Alert>
-          )}
+          <Suspense fallback={null}>
+            <MessageAlert />
+          </Suspense>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
