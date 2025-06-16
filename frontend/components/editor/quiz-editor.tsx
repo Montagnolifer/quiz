@@ -104,7 +104,7 @@ export default function QuizEditor({ quizId, initialData }: QuizEditorProps) {
         return
       }
   
-      const res = await fetch(`http://localhost:3000/quizzes/${quizId}`, {
+      const res = await fetch(`http://localhost:3005/quizzes/${quizId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -304,7 +304,7 @@ export default function QuizEditor({ quizId, initialData }: QuizEditorProps) {
     setError(null)
   
     try {
-      const res = await fetch(`http://localhost:3000/quizzes/${quizId}`, {
+      const res = await fetch(`http://localhost:3005/quizzes/${quizId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -377,7 +377,7 @@ export default function QuizEditor({ quizId, initialData }: QuizEditorProps) {
     setError(null)
   
     try {
-      const res = await fetch(`http://localhost:3000/quizzes/${quizId}`, {
+      const res = await fetch(`http://localhost:3005/quizzes/${quizId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -434,7 +434,7 @@ export default function QuizEditor({ quizId, initialData }: QuizEditorProps) {
   
       setSaveState("saving")
   
-      const res = await fetch(`http://localhost:3000/quizzes/${quizId}`, {
+      const res = await fetch(`http://localhost:3005/quizzes/${quizId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

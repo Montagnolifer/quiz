@@ -28,16 +28,16 @@ export default async function AnalyticsPage({ params }: { params: { id: string }
 
   try {
     // Agora use `id` normalmente
-    const resQuiz = await fetch(`http://localhost:3000/quizzes/${id}`)
+    const resQuiz = await fetch(`http://localhost:3005/quizzes/${id}`)
     const quiz = await resQuiz.json()
     
-    const resAttempts = await fetch(`http://localhost:3000/quizzes/quiz-attempts/${id}`)
+    const resAttempts = await fetch(`http://localhost:3005/quizzes/quiz-attempts/${id}`)
     const attempts = await resAttempts.json()
     
-    const resAnalytics = await fetch(`http://localhost:3000/quizzes/quiz-analytics/${id}`)
+    const resAnalytics = await fetch(`http://localhost:3005/quizzes/quiz-analytics/${id}`)
     const analytics = await resAnalytics.json()
     
-    const resProgress = await fetch(`http://localhost:3000/quizzes/quiz-progress/${id}`)
+    const resProgress = await fetch(`http://localhost:3005/quizzes/quiz-progress/${id}`)
     const partialAttempts = await resProgress.json()
 
     const attemptsList = Array.isArray(attempts) ? attempts : []

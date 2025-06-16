@@ -28,7 +28,7 @@ export default function QuizzesPage() {
       }
   
       try {
-        const res = await fetch("http://localhost:3000/quizzes", {
+        const res = await fetch("http://localhost:3005/quizzes", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -60,7 +60,7 @@ export default function QuizzesPage() {
     setError(null)
   
     try {
-      const res = await fetch("http://localhost:3000/quizzes", {
+      const res = await fetch("http://localhost:3005/quizzes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

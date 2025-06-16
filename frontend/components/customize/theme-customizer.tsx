@@ -43,7 +43,7 @@ useEffect(() => {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/quizzes/${quizId}`, {
+      const res = await fetch(`http://localhost:3005/quizzes/${quizId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -90,7 +90,7 @@ useEffect(() => {
     setError(null)
   
     try {
-      const res = await fetch(`http://localhost:3000/quizzes/${quizId}`, {
+      const res = await fetch(`http://localhost:3005/quizzes/${quizId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -104,7 +104,7 @@ useEffect(() => {
       if (!res.ok) throw new Error("Erro ao salvar tema")
   
       setSuccess("Tema salvo com sucesso")
-      setTimeout(() => setSuccess(null), 3000)
+      setTimeout(() => setSuccess(null), 3005)
     } catch (error: any) {
       setError(error.message)
     } finally {
