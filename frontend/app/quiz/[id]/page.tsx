@@ -15,9 +15,7 @@ export default function QuizPage() {
 
     const fetchQuiz = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL
-
-      const res = await fetch(`${apiUrl}/quizzes/${id}`)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quizzes/${id}`)
         const data = await res.json()
         if (!res.ok) throw new Error(data.message || "Erro ao buscar quiz")
         setQuiz(data)

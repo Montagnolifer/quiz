@@ -28,7 +28,7 @@ export default function QuizzesPage() {
       }
   
       try {
-        const res = await fetch("http://localhost:3005/quizzes", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quizzes`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -60,7 +60,7 @@ export default function QuizzesPage() {
     setError(null)
   
     try {
-      const res = await fetch("http://localhost:3005/quizzes", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quizzes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,9 +95,7 @@ export default function QuizzesPage() {
     }
   
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL
-
-      const res = await fetch(`${apiUrl}/quizzes/${id}/publish`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quizzes/${id}/publish`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -130,9 +128,7 @@ export default function QuizzesPage() {
     }
   
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL
-
-      const res = await fetch(`${apiUrl}/quizzes/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quizzes/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

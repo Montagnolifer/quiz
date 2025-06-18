@@ -25,7 +25,7 @@ export function DisplaySettingsForm({ initialTheme }: DisplaySettingsFormProps) 
       setTheme(selectedTheme)
 
       // Agora salva na API NestJS
-      const res = await fetch('http://localhost:3005/user/me', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/me`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
